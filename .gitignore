@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+nhap.py
+.vscode
+*.h5
+*.png 
+*.jpg
+ISIC2018_task1_GroundTruth
+ISIC2018_task1_training
+new_data
