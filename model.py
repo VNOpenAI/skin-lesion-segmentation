@@ -43,7 +43,6 @@ def decoder1(inputs, skip_connections):
     return x
 # def encoder2(inputs):
 #     skip_connections = []
-#
 #     output = DenseNet121(include_top=False, weights='imagenet')(inputs)
 #     model = tf.keras.models.Model(inputs, output)
 #
@@ -118,3 +117,4 @@ def build_model(shape):
     outputs = Concatenate()([outputs1, outputs2])
     model = Model(inputs, outputs)
     return model
+

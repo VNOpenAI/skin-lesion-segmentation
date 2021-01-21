@@ -219,11 +219,11 @@ def augment_data(images, masks, augment=True):
 
 class data_squence(tf.keras.utils.Sequence):
 
-    def __init__(self, x, y, batch_size=16, aug=False,):
+    def __init__(self, x, y, batch_size=16, ):
         self.x = x
         self.y = y
         self.batch_size = batch_size
-        self.aug = aug
+        
 
     def __len__(self,):
         return math.ceil(len(self.x)/self.batch_size)
@@ -231,14 +231,20 @@ class data_squence(tf.keras.utils.Sequence):
     def __getitem__(self, index):
         x_batch = self.x[index*self.batch_size:(index+1)*self.batch_size]
         y_batch = self.y[index*self.batch_size:(index+1)*self.batch_size]
-        data,label = augment_data(x_batch,y_batch,augment=self.aug)
-        data = np.stack(data, axis=0)
-        label = np.stack(label, axis=0)
-        label = np.stack([label, label], axis=-1)
-        label = label.astype(np.float32)
-        label = label/255.
+        data = []
+        label = []
+        for i in x_batch:
+            img = cv2.imread(i,cv2.IMREAD_COLOR)
+            data.append(img)
+        for i in y_batch:
+            lb = cv2.imread(i,cv2.IMREAD_COLOR)[:,:,0:2]
+            label.append(lb)
+        data = np.array(data)
+        label = np.array(data)
         data = data.astype(np.float32)
-        data = data/255.
+        label = label.astype(np.float32)
+        data = data/255. 
+        label = label /255.
         return data, label
 
     def on_epoch_end(self):
