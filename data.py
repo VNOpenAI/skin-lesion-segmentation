@@ -5,9 +5,6 @@ import os
 from sklearn.model_selection import train_test_split
 import math
 from utils import read_data
-ground_truth_folder = 'ISIC2018_task1_GroundTruth'
-training_folder = 'ISIC2018_task1_training'
-
 
 from albumentations import (
     PadIfNeeded,
@@ -44,7 +41,7 @@ def augment_data(images, masks, augment=True):
     size = (512, 384)
     list_of_img = []
     list_of_mask = []
-    for image, mask in tqdm(zip(images, masks), total=len(images)):
+    for image, mask in zip(images, masks):
         image_name = image.split("/")[-1].split(".")[0]
         mask_name = mask.split("/")[-1].split(".")[0]
 
@@ -236,7 +233,12 @@ class data_squence(tf.keras.utils.Sequence):
         y_batch = self.y[index*self.batch_size:(index+1)*self.batch_size]
         data,label = augment_data(x_batch,y_batch,augment=self.aug)
         data = np.stack(data, axis=0)
-        label = np.stack(label, axis=0)  
+        label = np.stack(label, axis=0)
+        label = np.stack([label, label], axis=-1)
+        label = label.astype(np.float32)
+        label = label/255.
+        data = data.astype(np.float32)
+        data = data/255.
         return data, label
 
     def on_epoch_end(self):

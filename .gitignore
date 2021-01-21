@@ -135,3 +135,5 @@ nhap.py
 ISIC2018_task1_GroundTruth
 ISIC2018_task1_training
 new_data
+checkpoint
+log
