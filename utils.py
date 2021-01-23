@@ -20,6 +20,3 @@ def transform_name_for_x_train(string_):
 def transform_name_for_y_train(string_):
     result = 'data_augmented/mask/' + string_
     return result
-
-
-

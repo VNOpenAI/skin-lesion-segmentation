@@ -35,6 +35,7 @@ from albumentations import (
     CoarseDropout
 )
 
+
 def augment_data(images, masks, augment=True):
     """ Performing data augmentation. """
     crop_size = (192-32, 256-32)
@@ -54,13 +55,13 @@ def augment_data(images, masks, augment=True):
             h, w, c = x.shape
 
         if augment == True:
-            ## Center Crop
+            # Center Crop
             aug = CenterCrop(p=1, height=crop_size[0], width=crop_size[1])
             augmented = aug(image=x, mask=y)
             x1 = augmented['image']
             y1 = augmented['mask']
 
-            ## Crop
+            # Crop
             x_min = 0
             y_min = 0
             x_max = x_min + size[0]
@@ -71,43 +72,44 @@ def augment_data(images, masks, augment=True):
             x2 = augmented['image']
             y2 = augmented['mask']
 
-            ## Random Rotate 90 degree
+            # Random Rotate 90 degree
             aug = RandomRotate90(p=1)
             augmented = aug(image=x, mask=y)
             x3 = augmented['image']
             y3 = augmented['mask']
 
-            ## Transpose
+            # Transpose
             aug = Transpose(p=1)
             augmented = aug(image=x, mask=y)
             x4 = augmented['image']
             y4 = augmented['mask']
 
-            ## ElasticTransform
-            aug = ElasticTransform(p=1, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03)
+            # ElasticTransform
+            aug = ElasticTransform(
+                p=1, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03)
             augmented = aug(image=x, mask=y)
             x5 = augmented['image']
             y5 = augmented['mask']
 
-            ## Grid Distortion
+            # Grid Distortion
             aug = GridDistortion(p=1)
             augmented = aug(image=x, mask=y)
             x6 = augmented['image']
             y6 = augmented['mask']
 
-            ## Optical Distortion
+            # Optical Distortion
             aug = OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)
             augmented = aug(image=x, mask=y)
             x7 = augmented['image']
             y7 = augmented['mask']
 
-            ## Vertical Flip
+            # Vertical Flip
             aug = VerticalFlip(p=1)
             augmented = aug(image=x, mask=y)
             x8 = augmented['image']
             y8 = augmented['mask']
 
-            ## Horizontal Flip
+            # Horizontal Flip
             aug = HorizontalFlip(p=1)
             augmented = aug(image=x, mask=y)
             x9 = augmented['image']
@@ -197,24 +199,24 @@ def augment_data(images, masks, augment=True):
             y25 = augmented['mask']
 
             images = [
-                x, x1, x2, x3, x4, x5, x6, x7, x8, x9, #x10,x11, x12, x13,
+                x, x1, x2, x3, x4, x5, x6, x7, x8, x9,  # x10,x11, x12, x13,
                 x14, x15, x16, x17, x18, x19, x20,
                 x21, x22, x23, x24, x25
             ]
-            masks  = [
-                y, y1, y2, y3, y4, y5, y6, y7, y8, y9, #y10, y11, y12, y13, 
+            masks = [
+                y, y1, y2, y3, y4, y5, y6, y7, y8, y9,  # y10, y11, y12, y13,
                 y14, y15, y16, y17, y18, y19, y20,
                 y21, y22, y23, y24, y25
             ]
-            images = list(map(lambda a: cv2.resize(a,size),images))
-            masks = list(map(lambda a: cv2.resize(a,size),masks))
+            images = list(map(lambda a: cv2.resize(a, size), images))
+            masks = list(map(lambda a: cv2.resize(a, size), masks))
         else:
-            images = [cv2.resize(x,size)]
-            masks  = [cv2.resize(y,size)]
+            images = [cv2.resize(x, size)]
+            masks = [cv2.resize(y, size)]
 
         list_of_img = list_of_img+images
-        list_of_mask = list_of_mask +masks
-    return list_of_img, list_of_mask    
+        list_of_mask = list_of_mask + masks
+    return list_of_img, list_of_mask
 
 
 class data_squence(tf.keras.utils.Sequence):
@@ -223,7 +225,6 @@ class data_squence(tf.keras.utils.Sequence):
         self.x = x
         self.y = y
         self.batch_size = batch_size
-        
 
     def __len__(self,):
         return math.ceil(len(self.x)/self.batch_size)
@@ -234,17 +235,17 @@ class data_squence(tf.keras.utils.Sequence):
         data = []
         label = []
         for i in x_batch:
-            img = cv2.imread(i,cv2.IMREAD_COLOR)
+            img = cv2.imread(i, cv2.IMREAD_COLOR)
             data.append(img)
         for i in y_batch:
-            lb = cv2.imread(i,cv2.IMREAD_COLOR)[:,:,0:2]
+            lb = cv2.imread(i, cv2.IMREAD_COLOR)[:, :, 0:2]
             label.append(lb)
         data = np.array(data)
         label = np.array(label)
         data = data.astype(np.float32)
         label = label.astype(np.float32)
-        data = data/255. 
-        label = label /255.
+        data = data/255.
+        label = label / 255.
         return data, label
 
     def on_epoch_end(self):
@@ -252,22 +253,21 @@ class data_squence(tf.keras.utils.Sequence):
 
 
 def preprocessing(img):
-    size = (512,384)
-    img2 = cv2.resize(img, (512,384))
+    size = (512, 384)
+    img2 = cv2.resize(img, (512, 384))
     img2 = np.clip(img2 - np.median(img2)+127, 0, 255)
     img2 = img2.astype(np.float32)
-    
+
     img2 = img2/255.
     return img2
 
-def get_predict(model,img):
+
+def get_predict(model, img):
     processed_img = preprocessing(img)
     processed_img = np.expand_dims(processed_img, axis=0)
     out_put = model.predict(processed_img)
-    out_put = out_put[...,-1]
+    out_put = out_put[..., -1]
     out_put = out_put[0]
-    out_put = sklearn.preprocessing.binarize(out_put,threshold = 0.5)
+    out_put = sklearn.preprocessing.binarize(out_put, threshold=0.5)
     out_put = out_put*255.
     return out_put
-
-    

@@ -9,7 +9,7 @@ alpha = 0.6
 
 class DiceLoss(tf.keras.losses.Loss):
     def call(self, y_true, y_pred):
-        y_true = tf.cast(y_true,tf.float32)
+        y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.cast(y_pred, tf.float32)
         y_true = Flatten()(y_true)
         y_pred = Flatten()(y_pred)
