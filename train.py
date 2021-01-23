@@ -1,32 +1,31 @@
-from sklearn.utils.validation import check_random_state
-from utils import transform_name, transform_name_for_x_train,transform_name_for_y_train
+from utils import transform_name, transform_name_for_x_train, transform_name_for_y_train, ground_truth_folder, training_folder
 from model import build_model
 import tensorflow as tf
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
 from data import data_squence
-from metrics import DiceLoss
+from metrics import DiceLoss, iou
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 import warnings
-from utils import ground_truth_folder,training_folder
+import pathlib
 warnings.filterwarnings('ignore')
 
-x = os.listdir(training_folder)
-y = list(map(transform_name, x))
-x = list(map(lambda a: training_folder + '/'+a, x))
-y = list(map(lambda a: ground_truth_folder + '/'+a, y))
 
-_, x_test, _, y_test = train_test_split(
-    x, y, test_size=0.2, random_state=1)
+filename = os.listdir('validation/mask')
+x_test = list(map(lambda a: 'validation/image/' +
+                  a.replace('_segmentation.png', '.jpg'), filename))
+y_test = list(map(lambda a: 'validation/mask/'+a, filename))
 
 file_name = os.listdir('data_augmented/mask')
-x_train = list(map(transform_name_for_x_train,file_name))
-y_train = list(map(transform_name_for_y_train,file_name))
+x_train = list(map(transform_name_for_x_train, file_name))
+y_train = list(map(transform_name_for_y_train, file_name))
 
 train = data_squence(x_train, y_train, batch_size=16,)
 validation = data_squence(x_test, y_test, batch_size=16, )
 
+
+pathlib.Path("./checkpoint").mkdir(exist_ok=True, parents=True)
 
 
 mc = ModelCheckpoint(filepath=os.path.join(
@@ -34,8 +33,8 @@ mc = ModelCheckpoint(filepath=os.path.join(
 tb = TensorBoard(log_dir='./log', write_graph=True)
 model = build_model((192, 256, 3))
 loss_function = DiceLoss()
-model.compile('Adam', loss=loss_function)
-model.fit(train,epochs =3,validation_data = validation,
-            initial_epoch=0,
-            verbose=1,           
-            callbacks=[tb,mc])
+model.compile('Adam', loss=loss_function, metrics=[iou])
+model.fit(train, epochs=100, validation_data=validation,
+          initial_epoch=0,
+          verbose=1,
+          callbacks=[tb, mc])

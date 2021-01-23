@@ -1,0 +1,5 @@
+numpy==1.19.3
+tensorflow==2.4.0
+opencv-python==4.5.1.48
+sklearn
+albumentations==0.5.2

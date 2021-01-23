@@ -5,7 +5,7 @@ import os
 from sklearn.model_selection import train_test_split
 import math
 from utils import read_data
-
+import sklearn.preprocessing
 from albumentations import (
     PadIfNeeded,
     HorizontalFlip,
@@ -240,7 +240,7 @@ class data_squence(tf.keras.utils.Sequence):
             lb = cv2.imread(i,cv2.IMREAD_COLOR)[:,:,0:2]
             label.append(lb)
         data = np.array(data)
-        label = np.array(data)
+        label = np.array(label)
         data = data.astype(np.float32)
         label = label.astype(np.float32)
         data = data/255. 
@@ -251,3 +251,23 @@ class data_squence(tf.keras.utils.Sequence):
         pass
 
 
+def preprocessing(img):
+    size = (512,384)
+    img2 = cv2.resize(img, (512,384))
+    img2 = np.clip(img2 - np.median(img2)+127, 0, 255)
+    img2 = img2.astype(np.float32)
+    
+    img2 = img2/255.
+    return img2
+
+def get_predict(model,img):
+    processed_img = preprocessing(img)
+    processed_img = np.expand_dims(processed_img, axis=0)
+    out_put = model.predict(processed_img)
+    out_put = out_put[...,-1]
+    out_put = out_put[0]
+    out_put = sklearn.preprocessing.binarize(out_put,threshold = 0.5)
+    out_put = out_put*255.
+    return out_put
+
+    

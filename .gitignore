@@ -137,3 +137,5 @@ ISIC2018_task1_training
 new_data
 checkpoint
 log
+validation
+test

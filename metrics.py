@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.layers import Flatten
+from tensorflow.keras.backend import epsilon
 
-smooth = 1e-152
 gamma = 2
 alpha = 0.6
 
@@ -27,7 +27,7 @@ def iou(y_true, y_pred):
     def f(y_true, y_pred):
         intersection = (y_true * y_pred).sum()
         union = y_true.sum() + y_pred.sum() - intersection
-        x = (intersection + smooth) / (union + smooth)
+        x = (intersection + epsilon) / (union + epsilon)
         x = x.astype(np.float32)
         return x
     return tf.numpy_function(f, [y_true, y_pred], tf.float32)
