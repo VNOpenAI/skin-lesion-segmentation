@@ -130,7 +130,7 @@ dmypy.json
 nhap.py
 .vscode
 *.h5
-*.png 
+ 
 *.jpg
 ISIC2018_task1_GroundTruth
 ISIC2018_task1_training
@@ -139,3 +139,4 @@ checkpoint
 log
 validation
 test
+data_augmented
