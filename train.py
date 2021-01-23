@@ -1,4 +1,4 @@
-from utils import transform_name, transform_name_for_x_train, transform_name_for_y_train, ground_truth_folder, training_folder
+from utils import transform_name_for_x_train, transform_name_for_y_train
 from model import build_model
 import tensorflow as tf
 import numpy as np
