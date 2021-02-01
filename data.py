@@ -254,7 +254,7 @@ class data_squence(tf.keras.utils.Sequence):
 
 def preprocessing(img):
     size = (512, 384)
-    img2 = cv2.resize(img, (512, 384))
+    img2 = cv2.resize(img, size)
     img2 = np.clip(img2 - np.median(img2)+127, 0, 255)
     img2 = img2.astype(np.float32)
 

@@ -103,8 +103,8 @@ def ASPP(x, filter):
     y = BatchNormalization()(y)
     y = Activation("relu")(y)
     return y
-def build_model(shape):
-    inputs = Input(shape)
+def create_double_u_net(input_shape):
+    inputs = Input(input_shape)
     x, skip_1 = encoder1(inputs)
     x = ASPP(x, 64)
     x = decoder1(x, skip_1)
@@ -118,3 +118,53 @@ def build_model(shape):
     model = Model(inputs, outputs)
     return model
 
+def create_unet(input_shape):
+    inputs = tf.keras.Input(input_shape)    
+    conv1 = Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(inputs)
+    conv2 = Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(conv1)
+
+    pool2 = MaxPool2D(pool_size=(2,2),padding='same')(conv2)
+    conv3 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(pool2)
+    conv4 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(conv3)
+
+    pool4 = MaxPool2D(pool_size=(2,2),padding='same')(conv4)
+    conv5 = Conv2D(256, kernel_size=(3,3), activation='relu', padding='same')(pool4)
+    conv6 = Conv2D(256, kernel_size=(3,3), activation='relu', padding='same')(conv5)
+
+    pool6 = MaxPool2D(pool_size=(2,2))(conv6)
+    conv7 = Conv2D(512, kernel_size=(3,3), activation='relu', padding='same')(pool6)
+    conv8 = Conv2D(512, kernel_size=(3,3), activation='relu', padding='same')(conv7)
+
+    pool8 = MaxPool2D(pool_size=(2,2))(conv8)
+    conv9 = Conv2D(1024, kernel_size=(3,3), activation='relu', padding='same')(pool8)
+    conv10 = Conv2D(1024, kernel_size=(3,3), activation='relu', padding='same')(conv9)
+
+    up11 = UpSampling2D(size=(2, 2))(conv10)
+    up11 = Conv2D(512, kernel_size=(3,3), activation='relu', padding='same')(up11)
+    up11 = Concatenate(axis=-1)([conv8,up11])
+    conv12 = Conv2D(512, kernel_size=(3,3), activation='relu', padding='same')(up11)
+    conv13 = Conv2D(512, kernel_size=(3,3), activation='relu', padding='same')(conv12)
+
+    up14 = UpSampling2D((2,2))(conv13)
+    up14 = Conv2D(256, kernel_size=(3,3), activation='relu', padding='same')(up14)
+    up14 = Concatenate(axis=-1)([conv6,up14])
+    conv15 = Conv2D(256, kernel_size=(3,3), activation='relu', padding='same')(up14)
+    conv16 = Conv2D(256, kernel_size=(3,3), activation='relu', padding='same')(conv15)
+
+    up17 = UpSampling2D((2,2))(conv16)
+    up17 = Conv2D(128, kernel_size=(3,3), activation='relu', padding='same')(up17)
+    up17 = Concatenate(axis=-1)([conv4,up17])
+    conv18 = Conv2D(128, kernel_size=(3,3), activation='relu', padding='same')(up17)
+    conv19 = Conv2D(128, kernel_size=(3,3), activation='relu', padding='same')(conv18)
+
+    up18 = UpSampling2D((2,2))(conv19)
+    up18 = Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(up18)
+    up18 = Concatenate(axis=-1)([conv2,up18])
+    conv19 = Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(up18)
+    conv20 = Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(conv19)
+    conv21 = Conv2D(1, kernel_size=(1,1), activation='sigmoid', padding = 'same')(conv20)
+
+    output = conv21
+    model = tf.keras.Model(inputs,output)
+
+    return output

@@ -14,7 +14,7 @@ class DiceLoss(tf.keras.losses.Loss):
         y_true = Flatten()(y_true)
         y_pred = Flatten()(y_pred)
         intersection = tf.reduce_sum(y_true*y_pred)
-        return 1 - ((2*intersection + smooth) / (tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) + smooth))
+        return 1 - ((2*intersection + epsilon) / (tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) + epsilon))
 
 
 """def focal_loss(y_true,y_pred):
