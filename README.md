@@ -1,11 +1,14 @@
-# U-net and DoubleU-net implementation
-implementation of U-net and DoubleU-net for lesion boundary Segmentation ( ISIC 2018-task 1)
+# Skin Lesion Segmentation
+
+Implementation of U-Net / DoubleU-Net for lesion boundary Segmentation (ISIC 2018-task 1).
+
+This implementation was integrated into VN AIDr - A medical image processing opensource. [Documentation](https://dr.vnopenai.org/vision/skin-lesion-segmentation/intro-and-data/).
 
 ## TODO
 
-- [x] Build model U-net.
+- [x] Build model U-Net.
 
-- [x] Build model DoubleU-net.
+- [x] Build model DoubleU-Net.
 
 - [x] Write code for Dice loss.
 
@@ -19,34 +22,33 @@ implementation of U-net and DoubleU-net for lesion boundary Segmentation ( ISIC 
 
 - [x] Convert model to onnx format.
 
-- [x] Adding pre-train code.
+- [x] Add pre-traind models.
 
 ## Preprequisites
 
-Before to start, ensure to the following requirements:
-
-* Install python 3 
-* Install needed librarys in requirements.txt by :  ```!pip install -r requirements.txt``` .
-* Dowload data ISIC2018_task1 Lesion Boundary Segmentation
-* Pre-train model :[[link here]](https://drive.google.com/drive/folders/1cwNzf9OSG3PD_8MCeVobl04HystIbCSV?usp=sharing) 
+* Install python 3.
+* Install dependencies using requirements.txt by :  ```!pip install -r requirements.txt```.
+* Download data from [ISIC2018_task1 Lesion Boundary Segmentation Challenge](https://challenge2018.isic-archive.com/).
+* Pre-train model :[[link here]](https://drive.google.com/drive/folders/1cwNzf9OSG3PD_8MCeVobl04HystIbCSV?usp=sharing).
 
 ## Architecture
-### 1,U-net
+### 1. U-net
 
-I modified architecture of Unet into difference resolution 192x 256 x 3 for more saving training time
-and compare to DoubleU-net
+I modified architecture of U-Net to use with image size 192x256x3, the same size implemented in DoubleU-Net paper.
 
-![ ](image/Unet_Architecture.png)
+![U-Net architecture](image/Unet_Architecture.png)
+
 ### 2,Double-net
-DoubleU-net includes two sub-network, look alike two U-net concatenated.
 
-Input fed into modified U-net and then generate output1,which have the same size as input image.
-The sub-network 2 for fine-grained propose, it was built from scratch, the same ideal with U-Net but in the net-work2's decoder, skip_connection from encoder1 was fed into.
+DoubleU-Net includes two sub-networks, look alike two U-Net concatenated.
 
-At the end the output1 and output2 was conatenated in channel axis. So we can get one of those for prediction.
-In original paper, author showed that output1 and output2 had the same result.
+Input is fed into modified U-Net and then generate Output1. Output1 has the same size as input image.
+The sub-network 2 is for fine-grained proposal. It was built from scratch with the same idea as U-Net. However, in the decoder of sub-network 2, skip_connection from encoder1 is fed into.
 
-![ ](image/DoubleU-net_Architecture.png "Text to show on mouseover").
+At the end the Output1 and Output2 was conatenated in channel axis. So we can get one of those for prediction.
+In original paper, author showed that Output1 and Output2 had the same result.
+
+![DoubleU-Net architecture](image/DoubleU-net_Architecture.png).
 
 ## Training
 
@@ -54,15 +56,15 @@ In original paper, author showed that output1 and output2 had the same result.
 
 There are two common ways to augment data:
 
-- Before Training.
+- Offline augmentation: Generate augmented images before training.
 
-- While Training.
+- Online augmentation: Generate augmented images during training progress.
 
-For saving training time, I chosen the first way.
+To reduce training time, I chosen the first way.
 
-Download raw data from [5]. for your convenience , I splited, augmented data and stored in link [6]. Download and put them in the same folder with your code.
+Download raw data from [5]. for your convenience, I splited, augmented data and stored in link [6]. Download and put them in the same folder with your code.
 
-Your Directory structure will be:
+Your directory structure will be:
 
 ```
 Unet-and-double-Unet-implementation
@@ -89,15 +91,17 @@ Unet-and-double-Unet-implementation
 
 ###
 ```
-Rune code below for training from scratch.
+
+Train your model:
 
 ```
 !python train.py
 
 ```
 
-Your model will be stored in folder checkpoint after every epochs.
-I also provide pre-train model in [7].
+Your model will be stored in folder `checkpoint` after every epoch.
+I also provide pre-trained model in [7].
+
 ## Result 
 
 ![demo1](image/demo2.png "demo")
@@ -106,7 +110,7 @@ I also provide pre-train model in [7].
 
 ## References: 
 
-[1] origin paper: [DoubleU-Net: A Deep Convolutional Neural
+[1] Origin paper: [DoubleU-Net: A Deep Convolutional Neural
 Network for Medical Image Segmentation](https://arxiv.org/pdf/2006.04868.pdf)
 
 [2] ASPP block :[DeepLab: Semantic Image Segmentation with
@@ -122,11 +126,12 @@ and Fully Connected CRFs](https://arxiv.org/pdf/1606.00915v2.pdf)
 [6] My data after augmented: [link here]()
 
 [7] Pre-train model :[[link here]](https://drive.google.com/drive/folders/1cwNzf9OSG3PD_8MCeVobl04HystIbCSV?usp=sharing) 
-## Contact 
-If you find any mistakes in my work, please contact me, I am really gratefull.
 
-```
-pesonal email: dovietchinh1998@gmail.com
-VNOpenAI team: vnopenai@gmail.com
-```
-Thanks for your Interest.
+## Contact 
+
+If you find any mistakes in my work, please contact me, I am really grateful.
+
+- **Pesonal email:** dovietchinh1998@gmail.com
+- **VNOpenAI team:** vnopenai@gmail.com
+
+Thanks for your interest!
