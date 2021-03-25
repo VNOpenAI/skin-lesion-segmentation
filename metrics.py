@@ -27,7 +27,7 @@ def iou(y_true, y_pred):
     def f(y_true, y_pred):
         intersection = (y_true * y_pred).sum()
         union = y_true.sum() + y_pred.sum() - intersection
-        x = (intersection + epsilon) / (union + epsilon)
+        x = (intersection + epsilon()) / (union + epsilon())
         x = x.astype(np.float32)
         return x
     return tf.numpy_function(f, [y_true, y_pred], tf.float32)
